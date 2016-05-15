@@ -26,4 +26,4 @@ To test, send a direct message to the bot you created in slack
 ```
 /msg @bert depart embarcadero
 ```
-Or invite your bot to a channel, then mention (@bert) to send commands
+Or invite your bot to a channel then chat with @bert as normal
