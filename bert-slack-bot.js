@@ -40,7 +40,7 @@ var witToken = 'Bearer ' + process.env.wit;
 
 //catches anything, call wit.ai to get intent
 controller.hears(['(.*)'],basicHandlers,function(bot,message) {
-  console.log(message.match[1]);
+  //console.log(message.match[1]); //to get the entire message typed
 
   //show bert is typing...
   bot.reply(message,{
@@ -64,29 +64,21 @@ controller.hears(['(.*)'],basicHandlers,function(bot,message) {
         station = obj.entities.station[0].metadata;//contains the bart station code as defined in the metadata
 
         var url = 'http://api.bart.gov/api/etd.aspx';
-        var paramObj = {cmd: 'etd', orig: station, key: 'MW9S-E7SL-26DU-VV8V'};
+        var paramObj = {cmd: 'etd', orig: station, key: 'MW9S-E7SL-26DU-VV8V'}; //key is public, you can get a private key if you want to
 
         var replyText = 'Here are the next departures from ';
 
         //sample REST GET (XML response) - note key is a public key
-        console.log('calling bart api');
         request.get({url: url, qs: paramObj}, function (error, response, body) {
-        console.log('response statusCode='+response.statusCode);
             if (!error && response.statusCode == 200) {
-                console.log(body);
                 parseXml(body, function (err, result) {
                 obj = JSON.parse(JSON.stringify(result));
 
                 replyText += '*'+obj.root.station[0].name + '*\n';
-                replyText += 'Current Time: '+obj.root.time;
-
-                console.log('current time: '+obj.root.time);
-                console.log('departing from station: '+obj.root.station[0].name);
+                replyText += '*Current Time:* '+obj.root.time;
               });
-              //obj.root.station[0].etd.forEach(getDestination);
 
               obj.root.station[0].etd.forEach(function(element, index, array){
-                console.log(element.destination);
                 replyText += '\n*Destination:* '+element.destination;
                 replyText += ' | *Leaving in:* ';
                 element.estimate.forEach(function(element, index, array){
@@ -97,36 +89,17 @@ controller.hears(['(.*)'],basicHandlers,function(bot,message) {
                   if (index < array.length-1) {
                     replyText += ', ';
                   }
-                  console.log(element.minutes);
-                  console.log('replyText='+replyText);
                 });
                 replyText += ' mins';
               });
 
-              console.log('FINAL replyText='+replyText);
               bot.reply(message,{
                 text: replyText,
                 attachments: [{
                 }]
               });
-
             }
         });
     }
-
   });
-
 });
-
-function getDestination(element, index, array) {
-    console.log('destination: '+element.destination);
-    element.estimate.forEach(getEstimateMins);
-
-}
-
-function getEstimateMins(element, index, array) {
-    if (element.minutes == 'Leaving') {
-      element.minutes == 0;
-    }
-    console.log('leaving in '+element.minutes+ ' mins');
-}
