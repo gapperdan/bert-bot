@@ -72,30 +72,36 @@ controller.hears(['(.*)'],basicHandlers,function(bot,message) {
                 parseXml(body, function (err, result) {
                 obj = JSON.parse(JSON.stringify(result));
 
-                replyText += obj.root.station[0].name + '\n';
-                replyText += 'Current Time: '+obj.root.time +'\n';
+                replyText += '*'+obj.root.station[0].name + '*\n';
+                replyText += 'Current Time: '+obj.root.time;
 
                 console.log('current time: '+obj.root.time);
                 console.log('departing from station: '+obj.root.station[0].name);
               });
               //obj.root.station[0].etd.forEach(getDestination);
 
-              obj.root.station[0].etd.forEach(function(element){
+              obj.root.station[0].etd.forEach(function(element, index, array){
                 console.log(element.destination);
-                replyText += 'Destination: '+element.destination + '\n';
-                element.estimate.forEach(function(element){
-                    replyText += 'in '+element.minutes + ' mins\n';
-                    console.log(element.minutes);
-                    console.log('replyText='+replyText);
+                replyText += '\n*Destination:* '+element.destination;
+                replyText += ' | *Leaving in:* ';
+                element.estimate.forEach(function(element, index, array){
+                  if (element.minutes == 'Leaving') {
+                    element.minutes = 0;
+                  }
+                  replyText += element.minutes;
+                  if (index < array.length-1) {
+                    replyText += ', ';
+                  }
+                  console.log(element.minutes);
+                  console.log('replyText='+replyText);
                 });
+                replyText += ' mins';
               });
 
               console.log('FINAL replyText='+replyText);
               bot.reply(message,{
                 text: replyText,
                 attachments: [{
-                  title: "Click here for more details",
-                  title_link: "tbd",
                 }]
               });
 
