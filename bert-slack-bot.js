@@ -97,7 +97,7 @@ controller.hears(['(.*)'],basicHandlers,function(bot,message) {
                   replyText += ' | *Leaving in:* ';
                   element.estimate.forEach(function(element, index, array){
                     if (element.minutes == 'Leaving') {
-                      element.minutes = 0;
+                      element.minutes = 'Now';
                     }
                     replyText += '`'+element.minutes+'`';
                     if (index < array.length-1) {
@@ -109,6 +109,12 @@ controller.hears(['(.*)'],basicHandlers,function(bot,message) {
 
                 bot.reply(message,{
                   text: replyText,
+                  attachments: [{
+                  }]
+                });
+              } else {
+                bot.reply(message,{
+                  text: 'Sorry, unable to get BART data at this time',
                   attachments: [{
                   }]
                 });
