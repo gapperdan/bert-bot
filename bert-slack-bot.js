@@ -22,6 +22,8 @@ var util = require('util');
 var stringify = require('node-stringify');
 var request = require('request');
 
+var stationService = require('./service/station.js');
+
 var controller = Botkit.slackbot({
     debug: false,
 });
@@ -60,11 +62,14 @@ controller.hears(['(.*)'],basicHandlers,function(bot,message) {
         console.log("response body="+body);
         obj = JSON.parse(body);
 
-        activity = obj.entities.activity[0].value.value;
-        station = obj.entities.station[0].metadata;//contains the bart station code as defined in the metadata
+        activity = obj.entities.activity[0].value;
+        station = obj.entities.station[0].value;
+        stationAbbr = stationService.getAbbr(station.toLowerCase());
+        console.log('station='+station);
+        console.log('stationAbbr='+stationAbbr);
 
         var url = 'http://api.bart.gov/api/etd.aspx';
-        var paramObj = {cmd: 'etd', orig: station, key: 'MW9S-E7SL-26DU-VV8V'}; //key is public, you can get a private key if you want to
+        var paramObj = {cmd: 'etd', orig: stationAbbr, key: 'MW9S-E7SL-26DU-VV8V'}; //key is public, you can get a private key if you want to
 
         var replyText = 'Here are the next departures from ';
 
@@ -72,8 +77,9 @@ controller.hears(['(.*)'],basicHandlers,function(bot,message) {
         request.get({url: url, qs: paramObj}, function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 parseXml(body, function (err, result) {
-                obj = JSON.parse(JSON.stringify(result));
 
+                obj = JSON.parse(JSON.stringify(result));
+                console.log('bart call result='+JSON.stringify(result));
                 replyText += '*'+obj.root.station[0].name + '*\n';
                 replyText += '*Current Time:* '+obj.root.time;
               });
