@@ -65,6 +65,7 @@ controller.hears(['(.*)'],basicHandlers,function(bot,message) {
         activity = obj.entities.activity[0].value;
         station = obj.entities.station[0].value;
         stationAbbr = stationService.getAbbr(station.toLowerCase());
+
         console.log('station='+station);
         console.log('stationAbbr='+stationAbbr);
 
@@ -74,38 +75,52 @@ controller.hears(['(.*)'],basicHandlers,function(bot,message) {
         var replyText = 'Here are the next departures from ';
 
         //sample REST GET (XML response) - note key is a public key
-        request.get({url: url, qs: paramObj}, function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                parseXml(body, function (err, result) {
+        if (stationAbbr == undefined) {
+          bot.reply(message,{
+            text: 'Sorry, unable to get BART data for station='+station,
+            attachments: [{
+            }]
+          });
+        } else {
+          request.get({url: url, qs: paramObj}, function (error, response, body) {
+              if (!error && response.statusCode == 200) {
+                  parseXml(body, function (err, result) {
 
-                obj = JSON.parse(JSON.stringify(result));
-                console.log('bart call result='+JSON.stringify(result));
-                replyText += '*'+obj.root.station[0].name + '*\n';
-                replyText += '*Current Time:* '+obj.root.time;
-              });
-
-              obj.root.station[0].etd.forEach(function(element, index, array){
-                replyText += '\n*Destination:* '+element.destination;
-                replyText += ' | *Leaving in:* ';
-                element.estimate.forEach(function(element, index, array){
-                  if (element.minutes == 'Leaving') {
-                    element.minutes = 0;
-                  }
-                  replyText += '`'+element.minutes+'`';
-                  if (index < array.length-1) {
-                    replyText += ', ';
-                  }
+                  obj = JSON.parse(JSON.stringify(result));
+                  console.log('bart call result='+JSON.stringify(result));
+                  replyText += '*'+obj.root.station[0].name + '*\n';
+                  replyText += '*Current Time:* '+obj.root.time;
                 });
-                replyText += ' mins';
-              });
 
-              bot.reply(message,{
-                text: replyText,
-                attachments: [{
-                }]
-              });
-            }
-        });
+                obj.root.station[0].etd.forEach(function(element, index, array){
+                  replyText += '\n*Destination:* '+element.destination;
+                  replyText += ' | *Leaving in:* ';
+                  element.estimate.forEach(function(element, index, array){
+                    if (element.minutes == 'Leaving') {
+                      element.minutes = 0;
+                    }
+                    replyText += '`'+element.minutes+'`';
+                    if (index < array.length-1) {
+                      replyText += ', ';
+                    }
+                  });
+                  replyText += ' mins';
+                });
+
+                bot.reply(message,{
+                  text: replyText,
+                  attachments: [{
+                  }]
+                });
+              }
+          });
+        }
+    } else { //error getting bart etd
+      bot.reply(message,{
+        text: 'Sorry, unable to get BART data at this time',
+        attachments: [{
+        }]
+      });
     }
   });
 });
