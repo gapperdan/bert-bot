@@ -8,10 +8,11 @@ as provided by the BART api http://api.bart.gov/docs/etd/etd.aspx
 ## Requirements
 * howdy.ai botkit (https://howdy.ai)
 * wit.ai app and server key (https://wit.ai)
-* xml2js
-* util
-* node-stringify
-* request
+* xml2js (https://www.npmjs.com/package/xml2js)
+* util (https://www.npmjs.com/package/util)
+* node-stringify (https://www.npmjs.com/package/node-stringify)
+* request (https://www.npmjs.com/package/request)
+* hashmap (https://www.npmjs.com/package/hashmap)
 
 ## To use for Slack:
 First, create a bot (name it bert for example) in your slack group and note down the API key
