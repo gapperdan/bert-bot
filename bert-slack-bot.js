@@ -42,6 +42,11 @@ var witToken = 'Bearer ' + process.env.wit;
 controller.hears(['(.*)'],basicHandlers,function(bot,message) {
   console.log(message.match[1]);
 
+  //show bert is typing...
+  bot.reply(message,{
+    type: 'typing'
+  });
+
   request({
     url: 'https://api.wit.ai/message',
     method: 'GET',
@@ -88,7 +93,7 @@ controller.hears(['(.*)'],basicHandlers,function(bot,message) {
                   if (element.minutes == 'Leaving') {
                     element.minutes = 0;
                   }
-                  replyText += element.minutes;
+                  replyText += '`'+element.minutes+'`';
                   if (index < array.length-1) {
                     replyText += ', ';
                   }
