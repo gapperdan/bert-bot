@@ -52,7 +52,14 @@ Or invite your bot to a channel then chat with @bert as normal
 }
 ```
 
-### to push the app (will automatically use node.js buildpack)
+### to push the app to pivotal web service (will automatically use node.js buildpack)
 ```
-cf push bert-bot -c "token=<your-slack-token> wit=<your-wit-server-key> node bert-slack-bot.js"
+//--no-route ==> no http requests routing
+//-t 180 ==> 180secs start/restart timeout
+cf push bert-bot --no-route -t 180 -c "token=<your-slack-token> wit=<your-wit-server-key> node bert-slack-bot.js"
+```
+
+### also turn off health-check, otherwise you’ll get error: ERR Timed out after 3m0s: health check never passed
+```
+cf set-health-check bert-bot none
 ```
