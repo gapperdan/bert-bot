@@ -92,26 +92,42 @@ controller.hears(['(.*)'],basicHandlers,function(bot,message) {
                   replyText += '*Current Time:* '+obj.root.time;
                 });
 
-                obj.root.station[0].etd.forEach(function(element, index, array){
-                  replyText += '\n*Destination:* '+element.destination;
-                  replyText += ' | *Leaving in:* ';
-                  element.estimate.forEach(function(element, index, array){
-                    if (element.minutes == 'Leaving') {
-                      element.minutes = 'Now';
-                    }
-                    replyText += '`'+element.minutes+'`';
-                    if (index < array.length-1) {
-                      replyText += ', ';
-                    }
+                //handle if no data for this station (bad api!)
+                if (obj.root.message[0].warning == 'No data matched your criteria.') {
+                  replyText += '\nNo trains found!';
+                  bot.reply(message,{
+                    text: replyText,
+                    attachments: [{
+                    }]
                   });
-                  replyText += ' mins';
-                });
+                } else {
+                  obj.root.station[0].etd.forEach(function(element, index, array){
+                    replyText += '\n*Destination:* '+element.destination;
+                    replyText += ' | *Leaving in:* ';
+                    element.estimate.forEach(function(element, index, array){
+                      if (element.minutes == 'Leaving') {
+                        element.minutes = 'Now';
+                      }
+                      replyText += '`'+element.minutes+'`';
+                      if (index < array.length-1) {
+                        replyText += ', ';
+                      }
+                    });
+                    replyText += ' mins';
+                  });
 
-                bot.reply(message,{
-                  text: replyText,
-                  attachments: [{
-                  }]
-                });
+                  bot.reply(message,{
+                    text: replyText,
+                    attachments: [{
+                    }]
+                  });
+
+                }
+
+
+
+
+
               } else {
                 bot.reply(message,{
                   text: 'Sorry, unable to get BART data at this time',
