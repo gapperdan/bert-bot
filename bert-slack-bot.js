@@ -32,8 +32,6 @@ var bot = controller.spawn({
     token: process.env.token
 }).startRTM();
 
-var basicHandlers = 'direct_message, direct_mention, mention';
-
 var activity;
 var station;
 
@@ -41,7 +39,7 @@ var station;
 var witToken = 'Bearer ' + process.env.wit;
 
 //catches anything, call wit.ai to get intent
-controller.hears(['(.*)'],basicHandlers,function(bot,message) {
+controller.hears(['(.*)'],['direct_message', 'direct_mention', 'mention'],function(bot,message) {
   //console.log(message.match[1]); //to get the entire message typed
 
   //show bert is typing...
